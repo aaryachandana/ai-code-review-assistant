@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Code Review Assistant</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; }
+    body { margin: 0; background: #0b1020; color: #eef2ff; }
+    main { max-width: 1000px; margin: 0 auto; padding: 56px 24px; }
+    .hero { padding: 36px; border: 1px solid #293354; border-radius: 24px; background: #121a31; }
+    h1 { font-size: clamp(2rem, 6vw, 4rem); margin: 0 0 12px; }
+    p { color: #aab5d6; line-height: 1.7; }
+    textarea { width: 100%; min-height: 300px; box-sizing: border-box; margin-top: 24px; padding: 18px; border-radius: 14px; border: 1px solid #34415f; background: #080d1b; color: #e8edff; font: 14px/1.6 ui-monospace, monospace; }
+    button { margin-top: 16px; padding: 12px 18px; border: 0; border-radius: 10px; background: #7c5cff; color: white; font-weight: 700; cursor: pointer; }
+    pre { white-space: pre-wrap; padding: 20px; border-radius: 14px; background: #080d1b; border: 1px solid #293354; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <h1>🤖 AI Code Review Assistant</h1>
+    <p>Paste code below and send it to your local FastAPI server. The backend combines deterministic security rules with an optional AI review.</p>
+    <textarea id="code">password = "demo-secret-123"
+
+user = input("Username: ")
+query = f"SELECT * FROM users WHERE name = '{user}'"
+print(query)</textarea>
+    <button onclick="review()">Review code</button>
+    <pre id="result">Results will appear here.</pre>
+  </section>
+</main>
+<script>
+async function review() {
+  const result = document.getElementById('result');
+  result.textContent = 'Reviewing…';
+  try {
+    const response = await fetch('http://127.0.0.1:8000/review', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({filename: 'demo.py', code: document.getElementById('code').value, use_ai: false})
+    });
+    result.textContent = JSON.stringify(await response.json(), null, 2);
+  } catch (error) {
+    result.textContent = 'Start the API first: uvicorn ai_code_review.api:app --reload';
+  }
+}
+</script>
+</body>
+</html>
